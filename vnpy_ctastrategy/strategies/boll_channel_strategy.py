@@ -97,7 +97,6 @@ class BollChannelStrategy(CtaTemplate):
         am.update_bar(bar)
         if not am.inited:
             return
-
         self.boll_up, self.boll_down = am.boll(self.boll_window, self.boll_dev)
         self.cci_value = am.cci(self.cci_window)
         self.atr_value = am.atr(self.atr_window)
@@ -124,7 +123,6 @@ class BollChannelStrategy(CtaTemplate):
 
             self.short_stop = self.intra_trade_low + self.atr_value * self.sl_multiplier
             self.cover(self.short_stop, abs(self.pos), True)
-
         self.put_event()
 
     def on_order(self, order: OrderData):

@@ -272,6 +272,12 @@ class CtaTemplate(ABC):
         """
         self.cta_engine.write_log(msg, self)
 
+    def write_trace(self, msg: str) -> None:
+        """
+        Write a log message.
+        """
+        self.cta_engine.write_trace(msg, self)
+
     def get_engine_type(self) -> EngineType:
         """
         Return whether the cta_engine is backtesting or live trading.

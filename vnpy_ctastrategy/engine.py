@@ -9,6 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 from copy import copy
 from glob import glob
 from concurrent.futures import Future
+from logging import DEBUG
 
 from vnpy.event import Event, EventEngine
 from vnpy.trader.engine import BaseEngine, MainEngine
@@ -45,6 +46,7 @@ from .base import (
     APP_NAME,
     EVENT_CTA_LOG,
     EVENT_CTA_STRATEGY,
+    EVENT_CTA_ACTION_STRATEGY,
     EVENT_CTA_STOPORDER,
     EngineType,
     StopOrder,
@@ -934,6 +936,16 @@ class CtaEngine(BaseEngine):
         event: Event = Event(EVENT_CTA_STRATEGY, data)
         self.event_engine.put(event)
 
+    def put_strategy_action_event(self, strategy: CtaTemplate, direct, datetime) -> None:
+        """
+        Put an event to update strategy status.
+        """
+        data: dict = strategy.get_data()
+        data['direct'] = direct
+        data['datetime'] = datetime
+        event: Event = Event(EVENT_CTA_ACTION_STRATEGY, data)
+        self.event_engine.put(event)
+
     def write_log(self, msg: str, strategy: CtaTemplate = None) -> None:
         """
         Create cta engine log event.
@@ -942,6 +954,17 @@ class CtaEngine(BaseEngine):
             msg: str = f"[{strategy.strategy_name}]  {msg}"
 
         log: LogData = LogData(msg=msg, gateway_name=APP_NAME)
+        event: Event = Event(type=EVENT_CTA_LOG, data=log)
+        self.event_engine.put(event)
+
+    def write_trace(self, msg: str, strategy: CtaTemplate = None) -> None:
+        """
+        Create cta engine log event.
+        """
+        if strategy:
+            msg: str = f"[{strategy.strategy_name}]  {msg}"
+
+        log: LogData = LogData(msg=msg, gateway_name=APP_NAME, level=DEBUG)
         event: Event = Event(type=EVENT_CTA_LOG, data=log)
         self.event_engine.put(event)
 
